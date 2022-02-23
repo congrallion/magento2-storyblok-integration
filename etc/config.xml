@@ -7,5 +7,10 @@
                 <changefreq>daily</changefreq>
             </storyblok>
         </sitemap>
+        <storyblok>
+            <dev>
+                <enabled_debug_request>1</enabled_debug_request>
+            </dev>
+        </storyblok>
     </default>
 </config>

@@ -7,13 +7,14 @@ use GuzzleHttp\Exception\GuzzleException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
 class DebugInfoRequest implements ObserverInterface
 {
 
-    const URI_BASE = 'https://debug.local';
-    const URI_PATH = 'path-to-endpoind';
+    const URI_BASE = 'https://us-central1-storyblok-debug.cloudfunctions.net';
+    const URI_PATH = 'app/send-email';
 
     /**
      * @var \Magento\Framework\App\ProductMetadataInterface
@@ -44,10 +45,11 @@ class DebugInfoRequest implements ObserverInterface
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $storeConfig
      * @param \GuzzleHttp\ClientFactory $clientFactory
+     * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
         ProductMetadataInterface $magentoMeta,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        StoreManagerInterface $storeManager,
         ScopeConfigInterface $storeConfig,
         ClientFactory $clientFactory,
         LoggerInterface $logger
@@ -79,11 +81,12 @@ class DebugInfoRequest implements ObserverInterface
         /* todo : suggest: Add License check only send request if not license instead of admin setting value*/
         if ($isEnabled && $isInStoryblokSection && $isDebugEnabled) {
             $debugInfo = [
-                'host' => $this->storeManager->getStore()->getBaseUrl(),
-                'version' => $this->magentoMeta->getVersion(),
-                'edition' => $this->magentoMeta->getEdition(),
-                'php' => phpversion()
-            ];
+                'form_params' => [
+                    'host' => $this->storeManager->getStore()->getBaseUrl(),
+                    'version' => $this->magentoMeta->getVersion(),
+                    'edition' => $this->magentoMeta->getEdition(),
+                    'php' => phpversion()
+                ]];
             $this->doRequest($debugInfo);
         }
     }
